@@ -48,6 +48,7 @@
 
 <script>
 
+import axios from 'axios';
    export default {
     name: 'studentCreate',
     data() {
@@ -59,7 +60,8 @@
                 phone: ''   
             },
             isLoading: false,
-            isLoadingTitle: 'Loading'
+            isLoadingTitle: 'Loading',
+            errorList: {}
         }
     },
     methods: {
@@ -70,8 +72,28 @@
 
             //alert('student saved successfully');
 
-            axios.post().then(res=> {
+            var myThis = this;
 
+            axios.post(`http://localhost:8000/api/students`,this.students).then(res=> {
+                
+                console.log(res,'res');
+                alert(res.data.message);
+
+                this.student.name = ''; 
+                this.student.course = '';
+                this.student.email = '';
+                this.student.phone = '';
+
+                this.isLoading = false;
+                this.isLoadingTitle = "Loading";
+            })
+            .catch(function(error) {
+              if (error.response) {
+                if(error.response.status == 422) {
+                    myThis.errorList = error.response.data.errors;
+                    this.isLoading = false;
+                }
+              }
             });
         }
    }
